@@ -1,0 +1,23 @@
+Sketchup
+
+Google Sketchup ist...
+
+Sketchup lässt sich sehr einfach um eigene Funktionen erweitern. Hierzu existiert eine Anbindung an die Programmiersprache Ruby. Ruby ist eine interpretierte Sprache die in den letzten Jahren vor allem durch das Open-Source Webframework Ruby on Rails größere Bekanntheit erreichte. Ruby zeichnet sich vor allem dadurch aus, das es eine sehr dynamische Sprache ist, die sich sehr gut auf spezifische Anwendungsszenarien anpassen lässt - So entsteht schnell das, was man gerne DSL (Domain Specific Language) nennt und auf den ersten Blick nicht unbedingt etwas mit Ruby zu tun haben scheint.
+
+Um Ruby-Skripte in Sketchup einzubinden müssen diese Sketchup bekannt gemacht werden. Hierzu müssen sie in einem speziellen Ordner abgelegt werden. Dieser ist von dem Betriebsystem abhängig. Wo die Skripte hinmüssen, sehen Sie in Tabelle 1
+
+| Windows | C:/Program Files/Google/Google SketchUp 8/Plugins |
+| Mac     | /Library/Application Support/Google SketchUp 8/SketchUp/Plugins |
+
+Sketchup lädt beim Start alle Skripte, die in diesem Ordner (oder in Unterordnern davon) und die auf .rb enden, also Ruby-Dateien sind.
+
+Allerdings ist es ein bisschen unpraktisch, immer in diesen System-Pfaden zu wandeln - Eine Alternative dazu zeigen wir später.
+
+Um die Skripte dann in Sketchup benutzen zu können kann man eigene Menüpunkte in das Hauptmenü packen, aber auch das Kontextmenü sowie die Toolbars um eigene Punkte erweitern. Als letzte Möglichkeit, die insbesondere zum Testen der Funktionen hervorragend geeignet ist, kann man Skripte über die Ruby-Konsole testen. Diese kann man über das Fenster-Menü öffnen. In dieser Konsole lassen sich dann direkt Ruby-Kommandos eingeben. Ein kleines Beispiel gefällig? Dann geben Sie doch mal folgenden Text in die Textzeile der Konsole ein und drücken Enter:
+
+UI.messagebox("IM IN UR SKETCHUP, SHOWIN YOU A MESSAGE")
+
+Wir werden auf die Konsole noch öfter zurückkommen, denn dort lässt alles ausprobieren, was man dann später in echten Skripten verwenden möchte.
+
+
+
