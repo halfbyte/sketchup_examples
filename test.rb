@@ -3,7 +3,7 @@ require 'sketchup'
 
 # Show the Ruby Console at startup so we can
 # see any programming errors we may make.
-Sketchup.send_action "showRubyPanel:"
+#Sketchup.send_action "showRubyPanel:"
 
 # Add a menu item to launch our plugin.
 UI.menu("PlugIns").add_item("Draw stairs 2") {

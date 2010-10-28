@@ -1,0 +1,4 @@
+- intro ruby-schnittstelle
+- einfache Geometrie (würfel, vielleicht Treppe?)
+- Selektion / Gruppierung
+- Copy / Rotate
