@@ -1,4 +1,6 @@
 - intro ruby-schnittstelle
 - einfache Geometrie (würfel, vielleicht Treppe?)
+- komplexe geometrie ("donut")
 - Selektion / Gruppierung
 - Copy / Rotate
+- Undo-History

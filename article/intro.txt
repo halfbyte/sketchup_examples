@@ -19,7 +19,80 @@ UI.messagebox("IM IN UR SKETCHUP, SHOWIN YOU A MESSAGE")
 
 Wir werden auf die Konsole noch öfter zurückkommen, denn dort lässt alles ausprobieren, was man dann später in echten Skripten verwenden möchte.
 
+Genug der grauen Theorie - Wir wollen ja Welten erbauen. Jeder Sketchup-Neuling fängt vermutlich damit an, ein Rechteck und dann im folgenden Einen Würfel zu erstellen. Genau das werden wir jetzt auch in Ruby versuchen.
+
+Als zusätzliches Werkzeug brauchen Sie eigentlich nur einen Texteditor, der mit Ruby-Code umgehen kann (und z.B. Syntax-Highlighting beherrscht), z.B. E oder JEdit für Windows und TextMate oder Smultron auf dem Mac.
+
+Legen Sie jetzt eine Datei namens "rectangle.rb" in einem Verzeichnis Ihrer Wahl an. Für den Anfang kopieren Sie sich das Listing 1, quasi die Essenz einer Sketchup-Ruby-Datei
+
+Listing 1: Ruby-Grundgerüst
+-------------------
+require 'sketchup'
+def create_rectangle
+
+end
+-------------------
+
+Für Ruby-Neulinge sei das Gerüst kurz Zeile für Zeile erklärt: require 'sketchup' lädt die Sketchup-Bibliothek, so dass das Skript auf die Sketchup-Objekte und Klassen zugreifen kann. def create_rectangle bis end ist eine (momentan noch etwas ärmliche) Methoden-Definition, die wir jetzt mit Leben füllen müssen.
+
+Doch vorweg: Wie genau bekomen wir den Code jetzt in Sketchup ausgeführt? Nun, eine Möglichkeit wäre, das Skript in den oben genannten Ordner zu kopieren und Sketchup neu zu starten. Das ist, gerade während der Entwicklung, etwas mühsam und dauert vor allem zu lange. Einfacher ist es, das Skript über die Ruby-Konsole zu laden. Hierzu geben sie folgendes Kommando in die Konsole ein (Den Pfad sollten natürlich sie an den Absoluten Pfad Ihrer Datei anpassen)
+
+load "/Users/jankrutisch/Documents/SketchupRuby/rectangle.rb"
+
+Wenn das geklappt hat, sollte die Ausgabe der Konsole in etwa so aussehen:
+
+> load "/Users/jankrutisch/Documents/SketchupRuby/rectangle.rb"
+true
+
+Gut. Passiert ist jetzt nicht besonders viel. Das liegt an zwei Dingen: Zum einen tut unser Code zur Zeit noch nichts. Zum anderen wird der Code von dem load-Befehl zwar geladen, was bei Ruby gleichbedeutend mit "ausgeführt" ist, aber der Code definiert eben nur eine Methode und führt sie nicht aus. Das können Sie zum testen aber auch am besten über die Konsole machen: Geben sie einfach den Befehl create_rectangle ein. Die Ausgabe sollte wie folgt aussehen:
+
+> create_rectangle
+nil
+
+Das beweist, dass der Code geladen wurde und die Methode funktioniert, soweit man das von einer leeren Methode sagen kann. Interessant: In Ruby haben auch Methoden, die nichts explizit zurückgeben (z.B. durch ein return-Statement), einen impliziten Rückgabewert (nil ist in Ruby das, was in anderen Programmiersprachenn NULL oder null ist).
+
+Aber: Wir wollten ja ein Rechteck zeichnen. den einfachsten Code dafür finden Sie in Listing 2:
 
 
+---------------------
+def create_rectangle
+  model = Sketchup.active_model
+  entities = model.entities
+  pt1 = [0, 0, 0]
+  pt2 = [9, 0, 0]
+  pt3 = [9, 9, 0]
+  pt4 = [0, 9, 0]
+  new_face = entities.add_face pt1, pt2, pt3, pt4
+end
+---------------------
+Hier gibt es jetzt ein bisschen mehr zu erklären. Sketchup ist die Basis-Klasse der Sketchup-API. Sie ist sozusagen der Einstiegspunkt. Die active_model-Methode gibt eine Referenz auf das aktuelle Sketchup-Dokument zurück - Mit der entities-Methode wiederum bekommt man eine Referenz auf eine Sammlung aller "Dinge" des Models. Wenn man neue 3D-Objekte erzeugen will, geschieht das in der Regel über die Entities-Sammlung (Collection). Um ein Rechteck zu erzeugen, brauchen wir die vier Eckpunkte des Rechtecks. Da wir uns in einem 3D-Raum befinden, müssen wir uns entscheiden, in welcher Ebene das Rechteck liegen soll. Der Einfachheit halber spannen wir das Rechteck mal zwischen der x- und der y-Achse auf, d.h. es liegt orthogonal zur z-Achse. Punkte lassen sich in der Ruby-API grundsätzlich entweder als Point3D-Objekte, oder aber als Arrays mit drei elementen ausdrücken, was lesbarer und einfacher ist. Nebenbei bemerkt: Wie man an diesem Beispiel erkennt, müssen Variablen in Ruby nicht deklariert werden, man kann sie einfach benutzen. Die add_face-Methode erstellt ein Face-Objekt und fügt es in die Entities-Sammlung ein. Ein Face-Objekt muss mindestens 3 Punkte haben (zwischen zwei Punkten kann man ja auch schließlich schwerlich eine Fläche aufspannen) und kann beliebig viele Punkte beinhalten, wobei diese alle in einer Ebene liegen müssen. In unserem Fall hat die Fläche (das Face) also vier Eckpunkte.
 
+Laden Sie die Datei noch einmal über die Ruby-Konsole in Sketchup (falls Sie Sketchup immer noch offen haben: Mit der Cursor-Hoch-Taste können sie frühere Eingaben wieder aufrufen) und führen Sie die methode aus. Das ergebnis sollte in etwa so aussehen wie im Bild 1. Glückwünsche an die Eltern, es ist ein Quadrat!
+
+Aber eigentlich wollten wir ja ein Rechteck bauen. Und vielleicht wollen wir ja auch mal andere Ausmaße angeben. Dazu können wir die Methode jetzt parametrisieren. Das folgende Beispiel macht unsere Methode wesentlich flexibler:
+--------------------------------
+def create_rectangle(width, height)
+  model = Sketchup.active_model
+  entities = model.entities
+  pt1 = [0, 0, 0]
+  pt2 = [width, 0, 0]
+  pt3 = [width, height, 0]
+  pt4 = [0, height, 0]
+  new_face = entities.add_face pt1, pt2, pt3, pt4
+end
+--------------------------------
+Jetzt müssen Sie die Methode in der Sketchup-Konsole aber auch mit parametern aufrufen. Das könnte z.B. so aussehen:
+
+create_rectangle(20,10)
+
+Jetzt könnten wir uns eigentlich langsam in die dritte Dimension vorwagen. Dazu fügen wir eine neue Methode in unsere Datei ein, die aus dem Rechteck einen Quader macht, dieses mal gleich mit konfigurierbarer Höhe.
+
+---------------------------------
+def create_box(width, height, depth)
+  face = create_rectangle(width, height)
+  face.pushpull(depth)
+end
+---------------------------------
+
+Die pushpull-Methode macht exakt das, was das Drücken/Ziehen-Werkzeug in Sketchup macht: Man kann 3D-Körper aus 2D-Flächen heraus ziehen. Wenn Sie die Methode in der Konsole ausprobieren, wird Ihnen auffallen, dass der Quader nach unten aus dem Koordinatensystem herauswächst. Das liegt an der Orientierung der Fläche, die quasi nach unten zeigt. Es gibt zwei einfache Wege, um das zu beheben: Zum einen könnte man pushpull einfach eine negative Zahl übergeben (eben pull statt push), zum anderen könnte man die Fläche vorher umdrehen. Dazu können zwischen die beiden Zeilen einfach eine dritte Zeile "face.reverse!" hinzufügen.
 
