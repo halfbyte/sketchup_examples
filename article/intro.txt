@@ -94,5 +94,25 @@ def create_box(width, height, depth)
 end
 ---------------------------------
 
-Die pushpull-Methode macht exakt das, was das Drücken/Ziehen-Werkzeug in Sketchup macht: Man kann 3D-Körper aus 2D-Flächen heraus ziehen. Wenn Sie die Methode in der Konsole ausprobieren, wird Ihnen auffallen, dass der Quader nach unten aus dem Koordinatensystem herauswächst. Das liegt an der Orientierung der Fläche, die quasi nach unten zeigt. Es gibt zwei einfache Wege, um das zu beheben: Zum einen könnte man pushpull einfach eine negative Zahl übergeben (eben pull statt push), zum anderen könnte man die Fläche vorher umdrehen. Dazu können zwischen die beiden Zeilen einfach eine dritte Zeile "face.reverse!" hinzufügen.
+Die pushpull-Methode macht exakt das, was das Drücken/Ziehen-Werkzeug in Sketchup macht: Man kann 3D-Körper aus 2D-Flächen heraus ziehen. Wenn Sie die Methode in der Konsole ausprobieren, wird Ihnen auffallen, dass der Quader nach unten aus dem Koordinatensystem herauswächst. Das liegt an der Orientierung der Fläche, die nach dem Zeichnen "nach unten" zeigt. Es gibt zwei einfache Wege, um das zu beheben: Zum einen könnte man pushpull einfach eine negative Zahl übergeben (eben pull statt push), zum anderen könnte man die Fläche vorher umdrehen. Dazu können zwischen die beiden Zeilen einfach eine dritte Zeile "face.reverse!" hinzufügen.
 
+Zugegeben, das war jetzt nicht sonderlich spannend - Würfel kann man ja auch recht einfach von Hand erzeugen. Wie wäre es mit etwas, das man nicht so leicht von Hand zeichnen kann - Einen Rahmen zum Beispiel. Dieses Element kann man ziemlich oft gebrauchen, z.B. wenn man Fenster konstruieren möchte.
+
+Damit man mit Hilfe des pushpull-Kommandos so einen Rahmen aus einer Fläche "herausziehen kann", brauchen wir also eine Fläche mit einem Loch drin. Der Weg dorthin ist ein bisschen seltsam, aber immerhin gibt es unterwegs noch etwas zu lernen: Wenn man mit Sketchup im Editor modelliert, verwendet man relativ häufig den "gruppieren"-Menübefehl um Objekte zusammenzufassen. Genau das können wir in unserem Skript auch machen und so unser Flächenproblem lösen: Wir erzeugen zunächst eine neue Gruppe:
+
+group = model.entities.add_group
+
+Jetzt können wir Flächen direkt zu der Entities-Sammlung der Gruppe hinzufügen und so gleich zusammenfassen. Für einen gleichförmigen Rahmen könnte das z.B. so aussehen:
+
+outer_face = group.entities.add_face([0,0,0], [10,0,0], [10,10,0], [0,10,0])
+inner_face = group.entities.add_face([2,2,0], [8,2,0], [8,8,0], [2,8,0])
+
+Wir haben jetzt also zwei Flächen, die in der selben Gruppe sind. Jetzt  kommt der Trick: Mit der folgenden Zeile können wir jetzt ein Loch in der größe der zweiten Fläche in die erste Fläche bohren:
+
+inner_face.erase!
+
+Jetzt können wir wie bei der Box mit pushpull daraus unseren Rahmen machen:
+
+outerface.pushpull -2
+
+Solche Helferlein sind schnell programmiert und erleichtern die Arbeit ungemein. Aber eigentlich ist es ja ein bisschen umständlich, 
