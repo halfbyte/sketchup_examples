@@ -15,5 +15,18 @@ def frame(width, height, thickness, depth)
     [thickness, height - thickness, 0]
   )
   face.erase!
+  outer_face.reverse!
   outer_face.pushpull(depth)  
+end
+
+
+def frame_with_inputbox
+  prompts = ['Breite', 'Höhe', 'Dicke', 'Tiefe']
+  values = [20, 20, 5, 5]
+  result = UI.inputbox prompts, values, "Create Frame"
+  frame(*result)
+end
+
+UI.menu("Plug-Ins").add_item("Draw Frame") do 
+  frame_with_inputbox
 end

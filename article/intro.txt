@@ -115,4 +115,80 @@ Jetzt können wir wie bei der Box mit pushpull daraus unseren Rahmen machen:
 
 outerface.pushpull -2
 
-Solche Helferlein sind schnell programmiert und erleichtern die Arbeit ungemein. Aber eigentlich ist es ja ein bisschen umständlich, 
+Solche Helferlein sind schnell programmiert und erleichtern die Arbeit ungemein. Aber: Der Aufruf über die Konsole eignet sich vielleicht fürs Testen, eigentlich möchte man aber natürlich die Funktion über ein Menü aufrufen und dann bitte auch die Parameter bequem über ein Fenster mit Eingabefeldern eingeben. Es lohnt sich, mit dem zweiten anzufangen, weil wir die Funktion dann immer noch über die Konsole starten können, aber schon das Eingabefenster testen können.
+
+Hierzu erzeugen wir eine zweite Methode, die Parameter über eine sog. Inputbox vom Benutzer erfragt und dann mit diesen unsere vorige Methode aufrufen.
+
+Die inputbox-Methode erwartet drei bzw. vier parameter. Der erste Parameter ist ein Array von Labels für die Eingabefelder. Der zweite ist ein Array von Default-Werten für die Eingabefelder. Der dritte Parameter ist entweder ein Array mit Werten, die aus den Eingabefeldern ein Dropdown machen, oder aber ein Titel für die Inputbox. Der vierte ist für den Titel reserviert, wenn der dritte, naja, sie können sich das denken.
+
+Die Methode könnte insgesamt so aussehen wie im Beispiel x:
+
+def frame_with_inputbox
+  prompts = ['Breite', 'Höhe', 'Dicke', 'Tiefe']
+  values = [20, 20, 5, 5]
+  result = UI.inputbox prompts, values, "Create Frame"
+  frame(*result)
+end
+
+Die Methode verwendet einen kleinen Ruby-Trick: Da die inputbox-Methode als Rückgabewert einfach ein Array in der selben Reihenfolge wie die beiden ersten Parameter-Arrays zurückgibt und unsere frame-Methode die Parameter in genau dieser Reihenfolge haben möchte, können wir den sog. Splat-Operator (den Asterisk) verwenden, um das Array auf die Parameter aufzuteilen. Eine etwas lesbarere Version finden Sie in Beispiel y:
+
+width, height, thickness, depth = result
+frame(width, height, thickness, depth)
+
+Jetzt fehlt nur noch ein Menüeintrag. Den kann man sehr einfach über die UI.menu-Methode erzeugen, wie das Beispiel x zeigt:
+
+UI.menu("Plug-Ins").add_item("Draw Frame") do 
+  frame_with_inputbox
+end
+
+Leider hat die Sache beim Entwickeln einen Haken: Jedes Mal, wenn man die Datei neu lädt, wird auch der Menüpunkt neu angelegt, so dass das Menü am Ende eine ellenlange Liste von "Draw Frame"-Einträgen ist. Es gibt leider auch keine Funktion um Menüeinträge zu löschen. Aber keine Sorge: Ein Neustart von Sketchup behebt das Problem.
+
+Die Methode zum Erzeugen von Frames liesse sich natürlich noch beliebig ausbauen - Momentan erzeugen wir das Objekt immer am Nullpunkt des Koordinatensystems, was ein bisschen unpraktisch ist. Ausserdem wäre es vielleicht interessant, den Rahmen auch in verschiedenen Ebenen zu zeichnen statt immer nur zwischen x- und y-Achse aufgespannt. Eine Version der Methode, die das alles kann, finden Sie in dem Code-Repository des Autors.
+
+Neben der Erzeugung von neuen Objekten kann es natürlich auch ganz spannend sein, bestehende Objekte zu nehmen und zu modifizieren. Als erste Spielerei gilt es, ein beliebiges Objekt entlang einer beliebigen Achse in frei wählbarem Abstand zu duplizieren.
+
+Mit der entstehenden Methode lässt sich ein beliebiges selektiertes Objekt vervielfältigen. Um die bearbeitung zu vereinfachen, gruppieren wir zunächst einmal die selektierten Objekte.
+
+Das ist im prinzip ein einzeiler:
+
+model.entities.add_group(model.selection)
+
+Die Luxus-Version, die im Code-Repository zu finden ist, kapselt ein paar Sonderfälle in einer Methode, die sich group_from_selection nennt. So checkt die Methode z.B. ob es sich bei dem selektierten Objekt vielleicht schon um eine Gruppe handelt.
+
+Um jetzt das Objekt zu duplizieren können wir einfach auf der Gruppe die copy-Methode aufrufen. Danach müssen wir das Objekt dann nur noch verschieben. Hierzu eignet sich die transform!-Methode, die sich auf der Gruppe aufrufen lässt. Die transform!-Methode braucht ein Transformation-Objekt. Die Transformation-Klasse stellt diverse Konstruktoren für Transformationen wie Skalierungen, Rotationen und Translationen zur Verfügung. Da es sich bei uns um eine einfache Translation handelt, können wir eine solche Transformation (z.B. für eine Verschiebung entlang der X-Achse) einfach erzeugen:
+
+transformation = Geom::Transformation.translation([10,0,0])
+
+Damit wir die Transformation entlang einer beliebig wählbaren Achse vornehmen können, wird unsere Methode einen Achsen-Parameter bekommen, der dann die Berechnung der Translation bestimmt. Zusätzlich kann man die Richtung noch als 1 oder -1 übergeben. Die Berechnung der Translation sehen Sie in Beispiel 1
+
+trans = case(axis)
+when :x
+  [distance * i * direction, 0, 0]
+when :y
+  [0, distance * i * direction, 0]
+when :z
+  [0, 0, distance * i * direction]
+end
+
+Mit dem entstehenden Array können wir jetzt eine Translation erzeugen und die Kopie unserer Gruppe transformieren:
+
+transformation = Geom::Transformation.translation(trans)
+copy.transform!(transformation)
+
+Für diese Funktion wäre natürlich ein Eintrag in das Kontext-Menü sehr sinnvoll. Die Einbindung in das Kontextmenü funktioniert etwas anders, da man in der Einbindung noch Vorbedingungen prüfen kann. In unserem Beispiel testen wir einfach mal, ob überhaupt etwas ausgewählt ist.
+
+UI.add_context_menu_handler do |menu|
+  if model.selection.length > 0
+    menu.add_separator
+    menu.add_item("Copy and Translate") { copy_with_dialog }
+  end
+end
+
+Damit kann man schon sehr viele schöne Dinge anstellen. Aber wie wäre es, Gegenstände zu rotieren, während man sie verschiebt.
+
+ 
+
+
+
+
+
