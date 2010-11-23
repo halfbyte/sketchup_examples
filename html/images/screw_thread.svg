@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48+devel r9834 custom"
+   sodipodi:docname="screw_thread.svg">
+  <defs
+     id="defs4">
+    <inkscape:path-effect
+       fuse_tolerance="0"
+       vertical_pattern="false"
+       prop_units="false"
+       tang_offset="0"
+       normal_offset="0"
+       spacing="0"
+       scale_y_rel="false"
+       prop_scale="1"
+       copytype="single_stretched"
+       pattern="m -35.35715,31.964286 0,10 10,-5 z"
+       is_visible="true"
+       id="path-effect3185"
+       effect="skeletal" />
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect3179"
+       is_visible="true"
+       pattern="M 0,0 0,10 10,5 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect3161"
+       is_visible="true"
+       pattern="m 0.17857143,0.53571429 0,9.99999971 9.99999957,-4.9999997 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect3157"
+       is_visible="true"
+       pattern="m -0.17857143,0.17857143 0,9.99999957 L 9.8214286,5.1785714 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect3149"
+       is_visible="true"
+       pattern="M 0,0 0,10 10,5 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect3145"
+       is_visible="true"
+       pattern="M 0,0 0,10 10,5 z"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.8"
+     inkscape:cx="194.82142"
+     inkscape:cy="677.31381"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1440"
+     inkscape:window-height="799"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0">
+    <sodipodi:guide
+       orientation="1,0"
+       position="237.14286,718.57143"
+       id="guide3069" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="438.57143,582.5"
+       id="guide3071" />
+    <sodipodi:guide
+       orientation="1,0"
+       position="201.78571,667.5"
+       id="guide3073" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="225.71429,532.14286"
+       id="guide3107" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="286.42857,733.57143"
+       id="guide3109" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="237.14286,546.07143"
+       id="guide3111" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="225.71429,561.42857"
+       id="guide3113" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 237.14286,399.20421 -35.35715,-20.41346 0,-16.01511 c 0,0 0,0 35.35715,-20.41346 0,-8.57143 0,-8.57143 0,-8.57143 l 0,0 0,0 0,0"
+       id="path3119"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <path
+       sodipodi:nodetypes="cccc"
+       inkscape:connector-curvature="0"
+       id="path3121"
+       d="m 237.14286,399.14789 c -35.35715,20.41346 -35.35715,20.41346 -35.35715,20.41346 l 0,16.01511 35.35715,20.41346"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 237.14286,455.93361 0,8.75"
+       id="path3125"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <path
+       sodipodi:type="arc"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="path3129"
+       sodipodi:cx="237.14285"
+       sodipodi:cy="399.32648"
+       sodipodi:rx="22.5"
+       sodipodi:ry="22.5"
+       d="m 221.65487,415.6474 a 22.5,22.5 0 0 1 0.25827,-32.88311"
+       sodipodi:start="2.3300146"
+       sodipodi:end="3.9688787"
+       sodipodi:open="true"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="225.17857"
+       y="415.75504"
+       id="text3131"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902"><tspan
+         sodipodi:role="line"
+         id="tspan3133"
+         x="225.17857"
+         y="415.75504"
+         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sans;-inkscape-font-specification:Helvetica">Flankenwinkel</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 201.78571,362.71932 -19.46428,0"
+       id="path3137"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 201.78571,419.50504 -19.46428,0"
+       id="path3139"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 187.5,419.50504 0,-56.78572 0,0 0,0 0,0 0,0"
+       id="path3141"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <path
+       style="fill:#000000;fill-rule:evenodd;stroke:none"
+       d="m 182.32266,370.46539 9.99754,0.22216 -4.8202,-8.1468 z"
+       id="path3155"
+       inkscape:path-effect="#path-effect3157"
+       inkscape:original-d="m 187.32143,370.57647 0.17857,-8.03572 0,0 0,0"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <path
+       style="fill:#000000;fill-rule:evenodd;stroke:none"
+       d="m 192.5,412.71932 -10,0 5,7.14286 z"
+       id="path3159"
+       inkscape:path-effect="#path-effect3161"
+       inkscape:original-d="m 187.5,412.71932 0,7.14286"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text3163"
+       y="394.505"
+       x="141.07143"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902"><tspan
+         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sans;-inkscape-font-specification:Helvetica"
+         y="394.505"
+         x="141.07143"
+         id="tspan3165"
+         sodipodi:role="line">Steigung</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 237.14286,337.8979 45.53571,0"
+       id="path3171"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <path
+       style="fill:#000000;fill-rule:evenodd;stroke:none"
+       d="m 243.01332,342.71688 -0.31236,-9.99512 -5.5581,5.17614 z"
+       id="path3177"
+       inkscape:path-effect="#path-effect3179"
+       inkscape:original-d="m 242.85714,337.71932 -5.71428,0.17858"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path3181"
+       d="m 201.78571,369.86219 45.53571,0"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <path
+       inkscape:connector-curvature="0"
+       inkscape:original-d="m 207.49999,369.68361 -5.71428,0.17858"
+       inkscape:path-effect="#path-effect3185"
+       id="path3183"
+       d="m 207.65617,374.68117 -0.31236,-9.99512 -5.5581,5.17614 z"
+       style="fill:#000000;fill-rule:evenodd;stroke:none"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text3187"
+       y="379.32645"
+       x="229.46429"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902"><tspan
+         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sans;-inkscape-font-specification:Helvetica"
+         y="379.32645"
+         x="229.46429"
+         id="tspan3189"
+         sodipodi:role="line">Aussenradius</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text3191"
+       y="348.25504"
+       x="245.71428"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/Users/jankrutisch/ruby/sketchup_examples/html/images/screw_thread.png"
+       inkscape:export-xdpi="136.39902"
+       inkscape:export-ydpi="136.39902"><tspan
+         style="font-size:10px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sans;-inkscape-font-specification:Helvetica"
+         y="348.25504"
+         x="245.71428"
+         id="tspan3193"
+         sodipodi:role="line">Innenradius</tspan></text>
+  </g>
+</svg>

@@ -1,0 +1,13 @@
+body {
+  font-family: Helvetica, Verdana, Arial, sans-serif;
+  background: #ccc;
+}
+
+#screw_thread { display: block; width: 300px; float:left;}
+#visual { width: 200px; padding: 20px; float:left; border: 1px solid black; margin-left: 20px; background: #fff;}
+
+input.error { background-color: #f44;}
+
+#errors ul {
+  background-color: red;
+}

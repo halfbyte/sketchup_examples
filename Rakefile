@@ -14,11 +14,11 @@ task :install_hook do
   this_path = File.expand_path(File.dirname(__FILE__))
   
   File.open(File.join(install_path, "load_examples.rb"), 'wb') do |file|
-    file.puts "# require all examples"
-    file.puts "require_all('#{this_path}')"
     file.puts "# add base dir and lib to load path for easier debugging"
     file.puts "$LOAD_PATH.unshift('#{this_path}')"
     file.puts "$LOAD_PATH.unshift('#{File.join(this_path, 'lib')}')"
+    file.puts "# require all examples"
+    file.puts "require_all('#{this_path}')"
   end
   
   puts "installed hook. you need to restart SketchUp now!"

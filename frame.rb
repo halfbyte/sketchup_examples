@@ -27,6 +27,10 @@ def frame_with_inputbox
   frame(*result)
 end
 
-UI.menu("Plug-Ins").add_item("Draw Frame") do 
-  frame_with_inputbox
+unless file_loaded? File.basename(__FILE__) 
+  UI.menu("Plug-Ins").add_item("Draw Frame") do 
+    frame_with_inputbox
+  end
 end
+
+file_loaded File.basename(__FILE__) 

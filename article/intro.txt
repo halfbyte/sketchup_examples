@@ -141,7 +141,15 @@ UI.menu("Plug-Ins").add_item("Draw Frame") do
   frame_with_inputbox
 end
 
-Leider hat die Sache beim Entwickeln einen Haken: Jedes Mal, wenn man die Datei neu lädt, wird auch der Menüpunkt neu angelegt, so dass das Menü am Ende eine ellenlange Liste von "Draw Frame"-Einträgen ist. Es gibt leider auch keine Funktion um Menüeinträge zu löschen. Aber keine Sorge: Ein Neustart von Sketchup behebt das Problem.
+Leider hat die Sache beim Entwickeln einen Haken: Jedes Mal, wenn man die Datei neu lädt, wird auch der Menüpunkt neu angelegt, so dass das Menü am Ende eine ellenlange Liste von "Draw Frame"-Einträgen ist. Es gibt leider auch keine Funktion um Menüeinträge zu löschen. Aber keine Sorge: Ein Neustart von Sketchup behebt das Problem. Ausserdem gibt es einen Trick, der ein bisschen an die #ifdef-Konstrukte aus C-Programmen erinnert, der das Problem zumindest Teilweise behebt: Man kann mit Hilfe von Sketchup verwalten, ob eine Datei bereits einmal geladen wurde und den Menüeintrag so nur beim erstem Mal hinzufügen. Achtung: Ändert sich der Code für die Menüeintragung, hilft wiederum nur der Sketchup-Neustart.
+
+unless file_loaded? File.basename(__FILE__) 
+  UI.menu("Plug-Ins").add_item("Draw Frame") do 
+    frame_with_inputbox
+  end
+end
+
+file_loaded File.basename(__FILE__) 
 
 Die Methode zum Erzeugen von Frames liesse sich natürlich noch beliebig ausbauen - Momentan erzeugen wir das Objekt immer am Nullpunkt des Koordinatensystems, was ein bisschen unpraktisch ist. Ausserdem wäre es vielleicht interessant, den Rahmen auch in verschiedenen Ebenen zu zeichnen statt immer nur zwischen x- und y-Achse aufgespannt. Eine Version der Methode, die das alles kann, finden Sie in dem Code-Repository des Autors.
 
@@ -175,18 +183,162 @@ Mit dem entstehenden Array können wir jetzt eine Translation erzeugen und die K
 transformation = Geom::Transformation.translation(trans)
 copy.transform!(transformation)
 
-Für diese Funktion wäre natürlich ein Eintrag in das Kontext-Menü sehr sinnvoll. Die Einbindung in das Kontextmenü funktioniert etwas anders, da man in der Einbindung noch Vorbedingungen prüfen kann. In unserem Beispiel testen wir einfach mal, ob überhaupt etwas ausgewählt ist.
+Für diese Funktion wäre natürlich ein Eintrag in das Kontext-Menü sehr sinnvoll. Die Einbindung in das Kontextmenü funktioniert etwas anders, da man in der Einbindung noch Vorbedingungen prüfen kann. In unserem Beispiel testen wir einfach mal, ob überhaupt etwas ausgewählt ist. Auch hier gilt wieder: Ohne das file_loaded? würden wir mit jedem neuladen der Datei einen neuen Kontextmenü-Eintrag erzeugen.
 
-UI.add_context_menu_handler do |menu|
-  if model.selection.length > 0
-    menu.add_separator
-    menu.add_item("Copy and Translate") { copy_with_dialog }
+
+unless file_loaded? File.basename(__FILE__) 
+  UI.add_context_menu_handler do |menu|
+    if model.selection.length > 0
+      menu.add_separator
+      menu.add_item("Copy and Translate") { copy_with_dialog }
+    end
   end
 end
 
-Damit kann man schon sehr viele schöne Dinge anstellen. Aber wie wäre es, Gegenstände zu rotieren, während man sie verschiebt.
+file_loaded File.basename(__FILE__)
+Damit kann man schon sehr viele schöne Dinge anstellen. Aber wie wäre es, Gegenstände zu rotieren, während man sie verschiebt. Mit dieser Technik sind viele interessante Körper möglich.
 
- 
+Um eine Rotation durchzuführen, gibt es natürlich auch einen Konstruktor auf der Geom::Transformation-Klasse. Oberflächlich sieht der ganz einfach aus.
+
+transformation = Geom::Transformation.rotation(point, axis_vector, angle)
+
+Allerdings ist das dann im Detail doch noch interessant. axis_vector und angle geben die Achse, um die Rotiert werden soll, sowie den Winkel an. In unserem Fall halten wir den axis_vector erst einmal einfach und rotieren nur um eine der Grundachsen. Dadurch ist der axis_vector entweder [1,0,0], [0,1,0] oder [0,0,1]. Der Winkel muss im Bogenmaß angegeben werden, d.h. 360° ensprechen 2π. Das erste Argument der Methode ist nun besonders interessant: Mit ihm kann man den Punkt angeben, um den die Rotation erfolgen soll. In dem kompletten Beispiel im Repository nutzen wir dies um durch einen Offset Dinge wie Rotationsmotoren oder Turbinen erzeugen zu können (Siehe Bild 4). Die Berechnung muss mit berücksichtigen, dass die Ursprungskoordinate nicht die Mitte der Gruppe ist, die wir erzeugen. Der Kern der Operation sieht dann so aus wie in Beispiel x zu sehen:
+
+(num).times do |i|
+  copy = group.copy
+  copy.transform! Geom::Transformation.rotation(point, axis_vector, step * i)
+  copies << copy
+end
+
+Der Winkel pro rotation (hier als "step" bezeichnet) berechnet sich daraus, in wie viele Teile die Rotation unterteilt werden soll, also hier 2 * π / num.
+
+Haben Sie eigentlich schon einmal versucht, nach einer solchen Mehrfach-Kopier-Aktion die Funktion "Rückgängig" aus dem Menü aufzurufen? So können Sie ihre Programme quasi rückwärts debuggen. Wenn Sie allerdings eine fertige Funktion rückgängig machen wollen und gerade ein Objekt 200 mal vervielfältigt haben, macht das dann doch keinen Spaß mehr. Lieber würde man die komplette Vervielfältigung in einem Schritt rückgängig machen wollen. hierzu gibt es eine sehr schöne Methode: Sie können alle Operationen, die sie in einem Schritt zusammenfassen wollen mit einem Methoden-Paar umschließen, wie in Beispiel 5 zu sehen
+
+model.start_operation "Name"
+# [...]
+model.commit_operation
+
+Wie sie sehen können Sie der Operation sogar noch einen Namen mitgeben, unter der diese dann im "Rückgängig machen"-Menüpunkt auftaucht. 
+
+Einen Nachteil hat unser momentanes Vorgehen noch: Wir "verpesten" gerade den Namensraum der Sketchup-API mit unseren Methoden. Ruby ist eine Objektorientierte Sprache mit Klassen und Klassenhierachien, das muss doch besser gehen. 
+
+Ein gängiges Vorgehen ist, die eigentlichen Methoden in einer Klasse, die in einem Modul liegt zu verbergen. Doch der Reihe nach. Module werden in Ruby für zwei Dinge verwendet: Zum einen ermöglichen sie, mehrere Klassen in eine Art Namensraum zu bündeln, vielleicht vergleichbar den Packages in Java. Zum anderen ersetzen sie aber auch die in Ruby nicht vorhandenene Ableitung von mehreren Oberklassen - Man kann Module in Klassen "hineinmixen", wodurch alle Methoden des Moduls auch in der Klasse vorhanden sind. Beide Varianten werden wir im folgenden kennenlernen.
+
+Zunächst kapseln wir erst einmal alles in einem Modul, in unserem Namensraum. Ich wähle hier, um die Zeilenlänge der Beispiele nicht zu gefährden, einen kurzen Namen. Es können auch JansSketchupTools heissen.
+
+Kommen wir für unser Beispiel noch einmal zu der Konstruktion von Körpern aus dem Nichts. Sketchup bietet ja erstaunlich wenig Grundkörper. So gibt es z.B. keinen einfachen Weg, eine Kugel zu erzeugen. Das soll das Ziel unseres nächsten Tools sein.
+
+Wir verpacken die Erstellung der Kugel also in eine Klasse. Diese kommt in das Modul. Das (nicht funktionsfähige) Grundgerüst unserer Klasse inklusive des Menüeintrags sieht dann so aus:
+
+module JK
+  class Sphere
+    def self.dialog
+      # [...]
+    end 
+  end
+end
+
+unless file_loaded? File.basename(__FILE__) 
+  UI.menu("Plug-Ins").add_item("Kugel") do 
+    JK::Sphere.dialog
+  end
+end
+file_loaded File.basename(__FILE__) 
+
+Die Klasse "Sphere", die unsere Kugel repräsentieren soll, hat also eine Klassenmethode, die den schon bekannten Dialog aufrufen soll. Danach wird die Methode sinnvollerweise einen Konstruktor aufrufen, der die Kugel erzeugt.
+
+In Ruby heissen die Konstruktoren von Klasse "initialize". Als Parameter erwarten wir einen Radius und eine Anzahl von Segmenten, in die wir die Kugel unterteilen wollen (Je mehr Segmente, desto runder wird die Kugel).
+
+def initialize(radius, segments)
+  @group = model.entities.add_group
+  @radius = radius
+  @segments = segments
+  points = points_for_sphere
+  add_faces(points)
+end
+
+Wir speichern den Radius sowie die Anzahl der Segmente erst einmal in einer sogenannten Instanzvariable ab, die in Ruby an dem @-Zeichen erkennbar ist. Diese Variablen haben in der gesamten Objektinstanz gültigkeit. Dies hat zur Folge, dass wir in den folgenden Methodenaufrufen diese Parameter nicht mehr mitschleifen müssen.
+
+Es gibt viele Wege, eine Kugel zu konstruieren. Die am leichtesten verständlichste ist vermutlich die, sich an den Breiten- und Längengraden eines Globus zu orientieren. Hierzu erzeugen wir Punkte, die jeweils die Schnittpunkte zwischen den Breiten- und Längengraden abbilden und ziehen zwischen diesen Punkten dann Flächen auf. Die Position im 3D-Raum eines Punktes (sofern er nicht ein Pol ist) lässt sich dann relativ einfach berechnen (davon ausgehend, das der Mittelpunkt der Kugel der Nullpunkt unseres Koordinatensystems ist):
+
+# col, row = zähler von 0..segmentanzahl
+# step = größe eines segments in bogenmaß
+[
+  @radius * Math.cos(step * col) * Math.sin(step * row), 
+  @radius * Math.sin(step * col) * Math.sin(step * row), 
+  @radius * Math.cos(step * row)
+]
+
+Da sich Sketchup beim Erzeugen von Flächen bitterlich beklagt, wenn man einen Punkt zweimal angibt, müssen wir für die beiden Pole der Kugel eine Sonderlösung bauen: Wir erzeugen unsere Punkte nur ab der zweiten Reihe und nur bis zur vorletzten. Die Methode, die die Flächen erzeugt, besteht deswegen aus drei Teilen: Zunächst wird die erste Reihe von Punkten mit dem oberen Pol verbunden, dann werden die mittleren Flächen erzeugt und zuletzt werden die Flächen zwischen der untersten Reihe und dem "Südpol" erzeugt.
+
+Wichtig: Widerstehen Sie dem Drang, den Kompletten Code für die Erzeugung der Kugel in der initialize-Methode unter zu bringen. Da Sie jetzt eine gekapselte Klasse gebaut haben, spricht nichts dagegen, sehr kleine Methoden zu bauen. Das komplette Beispiel im Repository versucht diese "Best practice" aus der Objektorientieren Entwicklung möglichst konsequent umzusetzen.
+
+Eine Sache nervt allerdings jetzt dann doch ein bisschen: Objekte immer im Nullpunkt des Koordinatensystems zu erzeugen funktioniert zum Testen ja ganz gut, wenn man aber gerade an einer komplexen Szenerie arbeitet, ist das vielleicht nicht mehr so angebracht. Aber: Das geht besser. Dafür gibt es in Sketchup die Komponenten. Um unsere Sphere-Klasse dazu zu bringen, anstelle einer Gruppe eine Komponente zu erzeugen, ist gar nicht so viel mehr Code nötig.
+
+Im Konstruktor der Klasse erzeugen wir statt einer Gruppe eine Komponentendefinition. Den Code dafür finden Sie in Beispiel x. 
+
+@definition = Sketchup.active_model.definitions.add "Sphere"
+@definition.insertion_point = Geom::Point3d.new(0, 0, -@radius)
+
+Eine solche Definition hat, genau wie eine Gruppe, auch ein Entities-Array, so dass sich die Erzeugung der Kugel nicht sehr unterscheidet. Ist die Komponenten-Definition komplett, können wir über Sketchup.active_model.place_component eine Instanz der Komponente erzeugen, die der Benutzer jetzt frei im Raum positionieren kann. Zusätzlich dazu haben einmal platzierte Komponenten zusätzliche "Anfasser" mit dessen Hilfe sie sich auch nachträglich verschieben und verdrehen lassen.
+
+Eine Kugel ist ja zugegebenermaßen ein relativ triviales Beispiel. Interessanter, gerade für technische Konstruktionen sind komplexere Formen, wie z.B. Schrauben bzw. Gewinde. Die Konstruktion eines Gewindes ist im allgemeinen gar nicht so schwierig: Man berechnet einfach drei Spiralen rund um einen zylinder und zeichnet dann die Flächen zwischen diesen Spiralen. Will man allerdings alle Bedingungen eines technischen Gewindes erfüllen, wird es schon interessanter: Um ein Gewinde am Ende einer Schraube vernünftig abzuschließen müssen wir diesen Sonderfall bei der Berechnung der Spiralen extra betrachen. Ausserdem gelten für technische Gewinde besondere Maße, was die Flankenwinkel etc. angeht. Insgesamt hat ein beliebiges Gewinde sehr viele Parameter, die sich teilweise gegenseitig bedingen (So kann bei einem bestimmten Flankenwinkel die Differenz zwischen Aussen- und Innenradius nicht beliebig groß sein), so dass wir hier vermutlich mit einem einfachen Dialog nicht weiter kommen. Für diese Fälle sieht Sketchup die sogenannten Web-Dialoge vor. Dies sind Dialog-Fenster, die es einem ermöglichen, mit Web-Technologien (HTML / CSS / Javascript) komplexe Dialoge zu bauen um dem Benutzer das erstellen einer Komponente so bequem wie möglich zu machen. Dies kann dann sogar soweit gehen, dass man mit Hilfe von Javascript und z.B. einem Canvas einstellungen mit einer dynamischen Zeichnung visualisiert.
+
+Sketchup sieht hierbei eine enge Verzahnung zwischen Javascript, das in einem solchen Webdialog läuft, und der Ruby-API vor.
+
+Der Web-Dialog läuft unter Windows in einem eingebetteten Internet Explorer und unter OS X in einem eingebetteten Safari. Dies gilt es bei der Auswahl der zu verwendenden Technologien zu berücksichtigen und plant man eine Sketchup-Erweiterung zu veröffentlichen, kann es nicht schaden, diese auf beiden Plattformen zu testen. Da sowohl auf dem Mac als auch unter Windows die jeweils installierten Browserversionen verwendet werden, muss man allerdings selber entscheiden, wie viel Arbeit man sich mit der Unterstützung von sehr alten Plattformen wie IE6 oder Safari 2 machen will.
+
+Ein Webdialog kann mit unseren Sketchup-Skripten kommunizieren - Man kann sowohl aus Ruby heraus Javascript-Funktionen des Webdialogs aufrufen, als auch umgekehrt Callbacks in Ruby aufrufen. Dies funktioniert über URLs, wie wir gleich sehen werden.
+
+Ein einfacher, Hallo-Welt-Webdialog ist in Beispiel X zu sehen.
+
+web_dialog = UI::WebDialog.new("Schraubgewinde", false, 'screw-thread-dialog')
+web_dialog.set_html("<html><body><h1>Hallo Welt</h1></body></html>")
+web_dialog.show
+
+Neben der Möglichkeit, HTML im Ruby-Code abzulegen, was bei kleineren Dialogen sicher noch möglich ist, kann man auch mit set_file eine lokale HTML-Datei in den Dialog laden. Wie man eine Datei aus einem html-Unterverzeichnis in den Dialog lädt, zeigt Beispiel X
+
+dialog.set_file(File.join(File.dirname(__FILE__), 'html', 'index.html'))
+
+Um eine Eingabe-Maske für unser Gewinde zu erstellen, verwenden wir ein HTML-Formular. Eine gute Übersicht über HTML-Formulare und wie man sie erstellt finden Sie unter [selfhtml].
+
+Das wichtigste ist das umschließende <form>-Tag, dort können wir festlegen, wohin das Formular abgesendet werden soll. In unserem Fall verwenden wir als action-URL eine spezielle Sketchup-URL, wie in Beispiel X zu sehen ist.
+
+<form id="screw_thread" action="skp:screw_thread_create@" method="get">
+  <input type="text" name="inner_radius" id="inner_radius" />
+</form>
+
+Doch was passiert jetzt, wenn wir das Formular absenden? Es wird versucht, ein Ruby-Callback aufzurufen, den wir natürlich erst erstellen müssen. Ein Codegerüst dafür ist in Beispiel X zu sehen:
+
+dialog.add_action_callback("screw_thread_create") do |dialog, params|
+  # hier irgendwas machen
+end
+
+Innerhalb des Blocks ist jetzt ein Verweis auf den Webdialog (dialog) und ein String mit allen Daten aus dem Formular (params) verfügbar. Man könnte die Daten jetzt aus dem String herausparsen, aber das geht auch einfacher, denn wir können mit einer Methode des dialog-Objekts auf die Formularfelder direkt zugreifen, wie in Beispiel X zu sehen. Da ein HTML-Formular-Textfeld Strings enthält, müssen wir den Rückgabewert mit Hilfe der to_f-Methode (die in Ruby auf jedem String verfügbar ist) in eine Fließkommazahl wandeln.
+
+inner_radius = dialog.get_element_value("inner_radius").to_f
+
+Um das Formular mit zusätzlicher Funktionalität zu versehen, steht wie gesagt Javascript zur Verfügung. Um die Entwicklung zu vereinfachen, verwenden wir im folgenden eine Javascript-Bibliothek namens jQuery, die viele Standard-Aufgaben einfacher macht und vor allem die diversen Unterschiede zwischen Safari und IE geschickt wegkapselt.
+
+In userem Fall sollten wir z.B. vor dem Abschicken des Formulars überprüfen, ob die Werte, die der Benutzer eingegeben hat, überhaupt sinnvoll sind. Bild X zeigt die übliche Bemaßung eines Gewindes. Passt jetzt z.B. der Öffnungswinkel des Gewindes nicht zu der Dicke des Gewindes (die sich durch Aussenradius - Innenradius berechnet), würde unser Code sehr seltsam aussehende Gewinde erzeugen. Auch sollte die Länge des Benötigten Gewindes möglichst so groß sein wie die Steigung des Gewindes, denn eine halbe Gewindeumdrehung macht in der Regel keinen Sinn. Im Beispiel X ist gezeigt, wie eine solche Validierung aussehen könnte. Mit Hilfe von jQuery wird dabei ein sog. Eventhandler an den Submit-Event des Formulars gehängt, d.h. wenn der Benutzer versucht, das Formular abzuschicken, wird zunächst unser Eventhandler aufgerufen. Gibt dieser "false" zurück, wird das Formular gar nicht erst abgesendet.
+
+$(function() {
+  $('#screw_thread').submit(function(e) {
+    var inner_radius = parseFloat($('#inner_radius').val());
+    var outer_radius = parseFloat($('#outer_radius').val());
+    var thickness = outer_radius - inner_radius;
+    var minimumLead = Math.tan(angle/2) * thickness;
+    if (minimumLead > (lead / 2)) {
+      alert("Die Werte ergeben kein wohlgeformtes Gewinde!");
+      return false;
+    }
+    return true;
+  });
+});
+
+Die Äussere funktion sorgt übrigens nur dafür, dass der Eventhandler erst installiert wird, wenn das Dokument des Webdialogs komplett von dem integrierten Browser geladen ist - Ansonsten kann es sein, dass jQuery das Formular noch gar nicht findet. Eine solche Kapselung in die $()-Funktion ist also immer sinnvoll, wenn man Eventhandler installieren möchte.
+
+Natürlich gäbe es noch viel mehr zu überprüfen - z.B. ob überhaupt sinnvolle Werte (also Zahlen) in den Feldern stehen. Eine komplette, schon sehr ausgefeilte Validierung finden Sie in dem Codebeispiel im Repository.
 
 
 
