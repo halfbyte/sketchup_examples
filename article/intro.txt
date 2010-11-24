@@ -71,6 +71,8 @@ Eine kurze Anmerkung zu den Einheiten mit denen da gerechnet wird: Sketchup verw
 
 Laden Sie die Datei noch einmal über die Ruby-Konsole in Sketchup (falls Sie Sketchup immer noch offen haben: Mit der Cursor-Hoch-Taste können sie frühere Eingaben wieder aufrufen) und führen Sie die methode aus. Das ergebnis sollte in etwa so aussehen wie im Bild 1. Glückwünsche an die Eltern, es ist ein Quadrat!
 
+!images/Sketchup - Rectangle.png
+
 Aber eigentlich wollten wir ja ein Rechteck bauen. Und vielleicht wollen wir ja auch mal andere Ausmaße angeben. Dazu können wir die Methode jetzt parametrisieren. Das folgende Beispiel macht unsere Methode wesentlich flexibler:
 --------------------------------
 def create_rectangle(width, height)
@@ -98,7 +100,7 @@ end
 
 Die pushpull-Methode macht exakt das, was das Drücken/Ziehen-Werkzeug in Sketchup macht: Man kann 3D-Körper aus 2D-Flächen heraus ziehen. Wenn Sie die Methode in der Konsole ausprobieren, wird Ihnen auffallen, dass der Quader nach unten aus dem Koordinatensystem herauswächst. Das liegt an der Orientierung der Fläche, die nach dem Zeichnen "nach unten" zeigt. Es gibt zwei einfache Wege, um das zu beheben: Zum einen könnte man pushpull einfach eine negative Zahl übergeben (eben pull statt push), zum anderen könnte man die Fläche vorher umdrehen. Dazu können zwischen die beiden Zeilen einfach eine dritte Zeile "face.reverse!" hinzufügen.
 
-Zugegeben, das war jetzt nicht sonderlich spannend - Würfel kann man ja auch recht einfach von Hand erzeugen. Wie wäre es mit etwas, das man nicht so leicht von Hand zeichnen kann - Einen Rahmen zum Beispiel. Dieses Element kann man ziemlich oft gebrauchen, z.B. wenn man Fenster konstruieren möchte.
+Zugegeben, das war jetzt nicht sonderlich spannend - Würfel kann man ja auch recht einfach von Hand erzeugen. Wie wäre es mit etwas, das man nicht so leicht von Hand zeichnen kann - Einen Rahmen zum Beispiel. Mit dem "Versatz"-Werkzeug geht das zwar tatsächlich auch von Hand, aber das Ergebnis ist oft zu ungenau. Dieses Element kann man ziemlich oft gebrauchen, z.B. wenn man Fenster konstruieren möchte.
 
 Damit man mit Hilfe des pushpull-Kommandos so einen Rahmen aus einer Fläche "herausziehen kann", brauchen wir also eine Fläche mit einem Loch drin. Der Weg dorthin ist ein bisschen seltsam, aber immerhin gibt es unterwegs noch etwas zu lernen: Wenn man mit Sketchup im Editor modelliert, verwendet man relativ häufig den "gruppieren"-Menübefehl um Objekte zusammenzufassen. Genau das können wir in unserem Skript auch machen und so unser Flächenproblem lösen: Wir erzeugen zunächst eine neue Gruppe:
 
@@ -116,6 +118,8 @@ inner_face.erase!
 Jetzt können wir wie bei der Box mit pushpull daraus unseren Rahmen machen:
 
 outerface.pushpull -2
+
+!images/Sketchup-Frame.png
 
 Solche Helferlein sind schnell programmiert und erleichtern die Arbeit ungemein. Aber: Der Aufruf über die Konsole eignet sich vielleicht fürs Testen, eigentlich möchte man aber natürlich die Funktion über ein Menü aufrufen und dann bitte auch die Parameter bequem über ein Fenster mit Eingabefeldern eingeben. Es lohnt sich, mit dem zweiten anzufangen, weil wir die Funktion dann immer noch über die Konsole starten können, aber schon das Eingabefenster testen können.
 
@@ -184,7 +188,7 @@ Mit dem entstehenden Array können wir jetzt eine Translation erzeugen und die K
 
 transformation = Geom::Transformation.translation(trans)
 copy.transform!(transformation)
-
+  
 Für diese Funktion wäre natürlich ein Eintrag in das Kontext-Menü sehr sinnvoll. Die Einbindung in das Kontextmenü funktioniert etwas anders, da man in der Einbindung noch Vorbedingungen prüfen kann. In unserem Beispiel testen wir einfach mal, ob überhaupt etwas ausgewählt ist. Auch hier gilt wieder: Ohne das file_loaded? würden wir mit jedem neuladen der Datei einen neuen Kontextmenü-Eintrag erzeugen.
 
 
@@ -198,7 +202,10 @@ unless file_loaded? File.basename(__FILE__)
 end
 
 file_loaded File.basename(__FILE__)
-Damit kann man schon sehr viele schöne Dinge anstellen. Aber wie wäre es, Gegenstände zu rotieren, während man sie verschiebt. Mit dieser Technik sind viele interessante Körper möglich.
+
+!images/Sketchup-CopyAndTranslate.png
+
+Damit kann man schon sehr viele schöne Dinge anstellen. Wie man in Bild 3 sehen kann. Aber wie wäre es, Gegenstände zu rotieren, während man sie verschiebt. Mit dieser Technik ist es möglich, viele interessante Körper zu erstellen.
 
 Um eine Rotation durchzuführen, gibt es natürlich auch einen Konstruktor auf der Geom::Transformation-Klasse. Oberflächlich sieht der ganz einfach aus.
 
@@ -212,7 +219,9 @@ Allerdings ist das dann im Detail doch noch interessant. axis_vector und angle g
   copies << copy
 end
 
-Der Winkel pro rotation (hier als "step" bezeichnet) berechnet sich daraus, in wie viele Teile die Rotation unterteilt werden soll, also hier 2 * π / num.
+Der Winkel pro rotation (hier als "step" bezeichnet) berechnet sich daraus, in wie viele Teile die Rotation unterteilt werden soll, also hier 2 * π / num. Das ergebnis kann, je nach Lage und Form des Ausgangskörpers, von einem Rotationsmotor bis hin zu einem vereinfachten Turbinenrotor reichen (Siehe Bild 4)
+
+!images/Sketchup-Rotationskopie.png
 
 Haben Sie eigentlich schon einmal versucht, nach einer solchen Mehrfach-Kopier-Aktion die Funktion "Rückgängig" aus dem Menü aufzurufen? So können Sie ihre Programme quasi rückwärts debuggen. Wenn Sie allerdings eine fertige Funktion rückgängig machen wollen und gerade ein Objekt 200 mal vervielfältigt haben, macht das dann doch keinen Spaß mehr. Lieber würde man die komplette Vervielfältigung in einem Schritt rückgängig machen wollen. hierzu gibt es eine sehr schöne Methode: Sie können alle Operationen, die sie in einem Schritt zusammenfassen wollen mit einem Methoden-Paar umschließen, wie in Beispiel 5 zu sehen
 
@@ -284,6 +293,8 @@ Im Konstruktor der Klasse erzeugen wir statt einer Gruppe eine Komponentendefini
 
 Eine solche Definition hat, genau wie eine Gruppe, auch ein Entities-Array, so dass sich die Erzeugung der Kugel nicht sehr unterscheidet. Ist die Komponenten-Definition komplett, können wir über Sketchup.active_model.place_component eine Instanz der Komponente erzeugen, die der Benutzer jetzt frei im Raum positionieren kann. Zusätzlich dazu haben einmal platzierte Komponenten zusätzliche "Anfasser" mit dessen Hilfe sie sich auch nachträglich verschieben und verdrehen lassen.
 
+!images/Sketchup-KugelFragezeichen.png
+
 Eine Kugel ist ja zugegebenermaßen ein relativ triviales Beispiel. Interessanter, gerade für technische Konstruktionen sind komplexere Formen, wie z.B. Schrauben bzw. Gewinde. Die Konstruktion eines Gewindes ist im allgemeinen gar nicht so schwierig: Man berechnet einfach drei Spiralen rund um einen zylinder und zeichnet dann die Flächen zwischen diesen Spiralen. Will man allerdings alle Bedingungen eines technischen Gewindes erfüllen, wird es schon interessanter: Um ein Gewinde am Ende einer Schraube vernünftig abzuschließen müssen wir diesen Sonderfall bei der Berechnung der Spiralen extra betrachen. Ausserdem gelten für technische Gewinde besondere Maße, was die Flankenwinkel etc. angeht. Insgesamt hat ein beliebiges Gewinde sehr viele Parameter, die sich teilweise gegenseitig bedingen (So kann bei einem bestimmten Flankenwinkel die Differenz zwischen Aussen- und Innenradius nicht beliebig groß sein), so dass wir hier vermutlich mit einem einfachen Dialog nicht weiter kommen. Für diese Fälle sieht Sketchup die sogenannten Web-Dialoge vor. Dies sind Dialog-Fenster, die es einem ermöglichen, mit Web-Technologien (HTML / CSS / Javascript) komplexe Dialoge zu bauen um dem Benutzer das erstellen einer Komponente so bequem wie möglich zu machen. Dies kann dann sogar soweit gehen, dass man mit Hilfe von Javascript und z.B. einem Canvas einstellungen mit einer dynamischen Zeichnung visualisiert.
 
 Sketchup sieht hierbei eine enge Verzahnung zwischen Javascript, das in einem solchen Webdialog läuft, und der Ruby-API vor.
@@ -302,7 +313,7 @@ Neben der Möglichkeit, HTML im Ruby-Code abzulegen, was bei kleineren Dialogen 
 
 dialog.set_file(File.join(File.dirname(__FILE__), 'html', 'index.html'))
 
-Um eine Eingabe-Maske für unser Gewinde zu erstellen, verwenden wir ein HTML-Formular. Eine gute Übersicht über HTML-Formulare und wie man sie erstellt finden Sie unter [selfhtml].
+Um eine Eingabe-Maske für unser Gewinde zu erstellen, verwenden wir ein HTML-Formular. Eine gute Übersicht über HTML-Formulare und wie man sie erstellt finden Sie unter [http://de.selfhtml.org/html/formulare/index.htm].
 
 Das wichtigste ist das umschließende <form>-Tag, dort können wir festlegen, wohin das Formular abgesendet werden soll. In unserem Fall verwenden wir als action-URL eine spezielle Sketchup-URL, wie in Beispiel X zu sehen ist.
 
@@ -340,7 +351,9 @@ $(function() {
 
 Die Äussere funktion sorgt übrigens nur dafür, dass der Eventhandler erst installiert wird, wenn das Dokument des Webdialogs komplett von dem integrierten Browser geladen ist - Ansonsten kann es sein, dass jQuery das Formular noch gar nicht findet. Eine solche Kapselung in die $()-Funktion ist also immer sinnvoll, wenn man Eventhandler installieren möchte.
 
-Natürlich gäbe es noch viel mehr zu überprüfen - z.B. ob überhaupt sinnvolle Werte (also Zahlen) in den Feldern stehen. Eine komplette, schon sehr ausgefeilte Validierung finden Sie in dem Codebeispiel im Repository.
+Natürlich gäbe es noch viel mehr zu überprüfen - z.B. ob überhaupt sinnvolle Werte (also Zahlen) in den Feldern stehen. Eine komplette, schon sehr ausgefeilte Validierung finden Sie in dem Codebeispiel im Repository. In Bild 6 ist der Dialog mit ausführlicher Fehlermeldung zu sehen.
+
+!images/Sketchup-SchraubgewindeWebdialog.png
 
 Wo gibt es Hilfe?
 
