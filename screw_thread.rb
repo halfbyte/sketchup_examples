@@ -29,13 +29,13 @@ module JK
       dialog.add_action_callback("screw_thread_create") do |dialog, params|
         puts params.inspect
         
-        # inner_radius = dialog.get_element_value("inner_radius").to_f
-        # outer_radius = dialog.get_element_value("outer_radius").to_f
-        # length = dialog.get_element_value("length").to_f
-        # lead = dialog.get_element_value("lead").to_f
-        # angle = dialog.get_element_value("angle").to_f
-        # dialog.close
-        # ScrewThread.new(inner_radius,outer_radius, length, lead, angle).place_component
+        inner_radius = dialog.get_element_value("inner_radius").to_f
+        outer_radius = dialog.get_element_value("outer_radius").to_f
+        length = dialog.get_element_value("length").to_f
+        lead = dialog.get_element_value("lead").to_f
+        angle = dialog.get_element_value("angle").to_f
+        dialog.close
+        ScrewThread.new(inner_radius,outer_radius, length, lead, angle).place_component
       end
     end
         
@@ -48,8 +48,8 @@ module JK
     def create_thread
       step = 2 * Math::PI / 24.0
       z_step = @lead.to_f / 24.0
-      
-      z_diff = (@outer_radius - @inner_radius) / Math::tan(@angle / 180 * Math::PI)
+      thickness = @outer_radius - @inner_radius
+      z_diff = thickness / Math::tan(@angle / 180 * Math::PI)
       
       mesh = Geom::PolygonMesh.new 
       
@@ -57,71 +57,152 @@ module JK
       inner_points = []
       top_points = []
       bottom_points = []
-      z = 0
+      z = - (2 * @lead)
       
       
       
-      while z < @length do
-        z = z_step * i
+      
+      while z < (@length + 2 * @lead)
         alpha = step * i
+        top_radius = @inner_radius + thickness
+        bottom_radius = @inner_radius + thickness
+        inner_radius = @inner_radius
+
         z_bottom = z - z_diff
         if z_bottom < 0
           z_bottom = 0
-          # TODO: anpassung radius für diesen fall damit Winkel konstant bleibt.
+          bottom_radius = @inner_radius + ((z - z_bottom) * Math::tan(@angle / 180 * Math::PI))
         end
-        z_top = z + z_diff
-        z_top = @length if (z_top > @length)
+        if z_bottom > @length
+          z_bottom = @length
+        end
+
+        z_top = z + z_diff        
+        if z_top > @length
+          z_top = @length
+          top_radius = @inner_radius + ((z_top - z) * Math::tan(@angle / 180 * Math::PI))
+        end
         
-        inner_points << mesh.add_point([Math.sin(alpha) * @inner_radius, Math.cos(alpha) * @inner_radius, z ])
-        top_points << mesh.add_point([Math.sin(alpha) * @outer_radius, Math.cos(alpha) * @outer_radius, z_top ])
-        bottom_points << mesh.add_point([Math.sin(alpha) * @outer_radius, Math.cos(alpha) * @outer_radius, z_bottom ])
+        if z_top < 0
+          z_top = 0
+        end
+        
+        # middle
+        z_middle = z
+        if z_middle > @length
+          z_middle = @length
+          inner_radius = @inner_radius + (z_middle - z_bottom) * Math::tan(@angle / 180 * Math::PI)
+        end
+        if z_middle < 0
+          z_middle = 0
+          inner_radius = @inner_radius + (z_top - z_middle) * Math::tan(@angle / 180 * Math::PI)
+        end
+        # adding points
+        if z_bottom <= z_middle && z_top >= z_middle
+          inner_points << mesh.add_point([Math.sin(alpha) * inner_radius, Math.cos(alpha) * @inner_radius, z_middle ])
+        else
+          inner_points << nil
+        end
+        if z_middle < @length
+          top_points << mesh.add_point([Math.sin(alpha) * top_radius, Math.cos(alpha) * top_radius, z_top ])
+        else
+          top_points << nil
+        end
+        if z_middle > 0 
+          bottom_points << mesh.add_point([Math.sin(alpha) * bottom_radius, Math.cos(alpha) * bottom_radius, z_bottom ])
+        else
+          bottom_points << nil
+        end
         
         # outer_points << mesh.add_point([Math.sin(alpha) * @outer_radius, Math.cos(alpha) * @outer_radius, z ])
         # inner_points_top << mesh.add_point([Math.sin(alpha) * @inner_radius, Math.cos(alpha) * @inner_radius, z_top])
         # inner_points_bottom << mesh.add_point([Math.sin(alpha) * @inner_radius, Math.cos(alpha) * @inner_radius, z_bottom])
         
         i += 1
+        z += z_step
       end
       (inner_points.length - 1).times do |i|
-        mesh.add_polygon([
-          inner_points[i], 
-          top_points[i], 
-          inner_points[i+1]
-        ])
-        mesh.add_polygon([
-          inner_points[i+1],
-          top_points[i], 
-          top_points[i+1]
-        ])
-        mesh.add_polygon([
-          inner_points[i], 
-          bottom_points[i], 
-          inner_points[i+1]
-        ])
-        mesh.add_polygon([
-          inner_points[i+1],
-          bottom_points[i], 
-          bottom_points[i+1]
-        ])        
-        if i >= 24
+        if (inner_points[i] && top_points[i] && inner_points[i + 1] && top_points[i + 1])
+          mesh.add_polygon([
+            inner_points[i], 
+            top_points[i], 
+            inner_points[i+1]
+          ])
+          mesh.add_polygon([
+            inner_points[i+1],
+            top_points[i], 
+            top_points[i+1]
+          ])
+        end
+        if (inner_points[i] && bottom_points[i] && inner_points[i+1] && bottom_points[i+1])
+          mesh.add_polygon([
+            inner_points[i], 
+            inner_points[i+1],
+            bottom_points[i]
+          
+          ])
+          mesh.add_polygon([
+            inner_points[i+1],
+            bottom_points[i+1],
+            bottom_points[i]
+          ])    
+        end
+        if bottom_points[i] && top_points[i - 24] && bottom_points[i+1] && top_points [i - 23]
           mesh.add_polygon([
             bottom_points[i], 
-            top_points[i - 24], 
-            bottom_points[i + 1]
+            bottom_points[i + 1],
+            top_points[i - 24]
+            
           ])
           mesh.add_polygon([
             bottom_points[i + 1],
             top_points[i - 23], 
             top_points[i - 24]
           ])        
-        else
-          # special solution.
         end
       end
       
+      # adding some meshes for the start and end of the thread
+      # 24.downto(1) do |i|
+      #   if (mesh.point_at(bottom_points[i]).z - @lead + (2 * z_diff)) < 0
+      #     if mesh.point_at(bottom_points[i]).z == 0
+      #       if (i < 2)
+      #         bottom_point_one = mesh.add_point [mesh.point_at(inner_points[i]).x, mesh.point_at(inner_points[i]).y, 0]
+      #         mesh.add_polygon(bottom_point_one, bottom_points[i], bottom_points[i - 1])
+      #       else
+      #         bottom_point_one = mesh.add_point [mesh.point_at(inner_points[i]).x, mesh.point_at(inner_points[i]).y, 0]
+      #         bottom_point_two = mesh.add_point [mesh.point_at(inner_points[i - 1]).x, mesh.point_at(inner_points[i - 1]).y, 0]
+      #         mesh.add_polygon(bottom_points[i], bottom_point_one, bottom_point_two)
+      #         mesh.add_polygon(bottom_points[i - 1], bottom_points[i], bottom_point_two)
+      #       end
+      #     else
+      #       bottom_inner_point_one = mesh.add_point [mesh.point_at(inner_points[i]).x, mesh.point_at(inner_points[i]).y, 0]
+      #       bottom_inner_point_two = mesh.add_point [mesh.point_at(inner_points[i - 1]).x, mesh.point_at(inner_points[i - 1]).y, 0]
+      #       bottom_outer_point_one = mesh.add_point [mesh.point_at(bottom_points[i]).x, mesh.point_at(bottom_points[i]).y, 0]
+      #       bottom_outer_point_two = mesh.add_point [mesh.point_at(bottom_points[i - 1]).x, mesh.point_at(bottom_points[i - 1]).y, 0]
+      #       mesh.add_polygon(bottom_points[i], bottom_outer_point_one, bottom_outer_point_two)
+      #       mesh.add_polygon(bottom_points[i - 1], bottom_points[i], bottom_outer_point_two)
+      #       mesh.add_polygon(bottom_inner_point_one, bottom_outer_point_two, bottom_outer_point_one)
+      #       mesh.add_polygon(bottom_inner_point_one, bottom_inner_point_two, bottom_outer_point_two)
+      #     end
+      #   else
+      #     
+      #     bottom_inner_point_one = mesh.add_point [mesh.point_at(inner_points[i]).x, mesh.point_at(inner_points[i]).y, 0]
+      #     bottom_inner_point_two = mesh.add_point [mesh.point_at(inner_points[i - 1]).x, mesh.point_at(inner_points[i - 1]).y, 0]
+      #     bottom_outer_point_one = mesh.add_point [mesh.point_at(bottom_points[i]).x, mesh.point_at(bottom_points[i]).y, mesh.point_at(bottom_points[i]).z - @lead + (2 * z_diff)]
+      #     bottom_outer_point_two = mesh.add_point [mesh.point_at(bottom_points[i - 1]).x, mesh.point_at(bottom_points[i - 1]).y, mesh.point_at(bottom_points[i - 1]).z - @lead + (2 * z_diff)]
+      # 
+      # 
+      #     mesh.add_polygon(bottom_points[i], bottom_outer_point_one, bottom_outer_point_two)
+      #     mesh.add_polygon(bottom_points[i - 1], bottom_points[i], bottom_outer_point_two)
+      #     # mesh.add_polygon(bottom_inner_point_one, bottom_outer_point_two, bottom_outer_point_one)
+      #     # mesh.add_polygon(bottom_inner_point_one, bottom_inner_point_two, bottom_outer_point_two)
+      #               
+      #   end
+      # end
       
-      # mesh.add_polygon(inner_points_bottom.first, inner_points_top.first, outer_points.first)
-      # mesh.add_polygon(inner_points_bottom.last, inner_points_top.last, outer_points.last)
+      
+      
       @definition.entities.add_faces_from_mesh(mesh, 0)
       
       
@@ -143,4 +224,5 @@ unless file_loaded? File.basename(__FILE__)
     JK::ScrewThread.dialog
   end
 end
+
 file_loaded File.basename(__FILE__) 

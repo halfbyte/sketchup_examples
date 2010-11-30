@@ -1,0 +1,24 @@
+Sketchup-Beispiele
+------------------
+
+Wenn Sie auf Ihrem Rechner neben Sketchup auch Ruby installiert haben, können Sie mit einem einfachen Kommandozeilen-Aufruf alle Skripte zum laufen bringen:
+
+$ rake install_hook
+
+Dies installiert ein kleines Ruby-Skript in den Plugin-Folder von Google Sketchup, welches beim Start die Skripte aus Ihrem Verzeichnis nachlädt.
+
+Es fügt ausserdem einen Menüpunkt zu dem Plugins-Menü hinzu, mit dem alle Skripte aus diesem Verzeichnis neu geladen werden. Ein regelmäßiger Neustart von Sketchup entfällt damit.
+
+Haben Sie kein Ruby installiert (das ist zum ausprobieren unserer Beispiele auch nicht zwingend nötig), können Sie das kleine Skript auch selber installieren. Sie müssen nur den Pfad in der Variable this_path auf den Pfad zu ändern, in dem die Beispiele liegen.
+
+---------------8<-------------------
+# add base dir and lib to load path for easier debugging"
+this_path = 'C:\Dokumente und Einstellungen\jan\Eigene Dateien\Sketchup-Beispiele\'
+$LOAD_PATH.unshift(this_path)
+$LOAD_PATH.unshift('#{File.join(this_path, 'lib')}')
+# require all examples
+require_all('#{this_path}')
+---------------8<-------------------
+
+Diese Datei muss dann, wie im Artikel beschrieben, in den jeweils passenden Plugins-Ordner von Sketchup eingefügt werden.
+
