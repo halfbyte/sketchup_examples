@@ -3,9 +3,9 @@ require 'common_tools'
 
 include CommonTools
   
-def copy_and_rotate(num = 10, offset = 0,axis = :x)
+def kopieren_und_rotieren(anzahl = 10, versatz = 0,achse = :x)
   
-  axis_vector = case(axis)
+  achsenvektor = case(achse)
   when :x; Geom::Vector3d.new(1,0,0)
   when :y; Geom::Vector3d.new(0,1,0)
   when :z; Geom::Vector3d.new(0,0,1)
@@ -13,58 +13,57 @@ def copy_and_rotate(num = 10, offset = 0,axis = :x)
     Geom::Vector3d.new(1,0,0)
   end
   
-  origin = Geom::Point3d.new(axis_vector.to_a.map{ |p| p * offset })
-  puts origin.to_a.inspect
+  ursprung = Geom::Point3d.new(achsenvektor.to_a.map{ |p| p * versatz })
   
-  model.start_operation "CopyRotator"
-  if group = group_from_selection
-    step = 2 * Math::PI / num
+  modell.start_operation "Kopieren und Rotieren"
+  if gruppe = gruppe_aus_auswahl
+    schrittweite = 2 * Math::PI / anzahl
   
-    copies = [group]
+    kopien = [gruppe]
     
-    # setting origin of rotation to middle of object / offset
-    point = group.transformation.origin  
-    case(axis)
+    # Verschiebepunkt liegt in der geometrischen Mitte der Gruppe
+    punkt = gruppe.transformation.origin  
+    case(achse)
     when :x
-      point.z = point.z + group.bounds.depth / 2
-      point.y = point.y - offset
+      punkt.z = punkt.z + gruppe.bounds.depth / 2
+      punkt.y = punkt.y - versatz
     when :y
-      point.z = point.z + group.bounds.depth / 2
-      point.x = point.x - offset
+      punkt.z = punkt.z + gruppe.bounds.depth / 2
+      punkt.x = punkt.x - versatz
     when :z
-      point.y = point.y + group.bounds.height / 2
-      point.x = point.x - offset
+      punkt.y = punkt.y + gruppe.bounds.height / 2
+      punkt.x = punkt.x - versatz
     end
-    (num).times do |i|
-      copy = group.copy
-      copy.transform! Geom::Transformation.rotation(point, axis_vector, step * i)
-      copies << copy
+    (anzahl).times do |i|
+      kopie = gruppe.copy
+      kopie.transform! Geom::Transformation.rotation(punkt, achsenvektor, schrittweite * i)
+      kopien << kopie
     end
-    whole_group = model.entities.add_group(copies)
+    ganze_gruppe = model.entities.add_group(kopien)
   else    
-    UI.messagebox "Sie haben nichts gutes selektiert, was kopiert werden könnte", MB_OK
+    UI.messagebox "Sie haben nichts gutes selektiert was kopiert werden koennte", MB_OK
   end
   model.commit_operation
 end
 
 
-def copy_and_rotate_with_dialog
-  prompts = ['Anzahl', 'Abstand', 'Achse']
-  values = [10, 10,'x']
-  options = [nil, nil, 'x|y|z']
-  result = UI.inputbox prompts, values, options, "Rotatations-Kopie"
-  num, distance, axis, direction = result
-  copy_and_rotate(num, distance, axis.to_sym)
+def kopieren_und_rotieren_mit_dialog
+  namen = ['Anzahl', 'Abstand', 'Achse']
+  werte = [10, 10,'x']
+  optionen = [nil, nil, 'x|y|z']
+  resultat = UI.inputbox namen, werte, optionen, "Kopieren und Rotieren"
+  anzahl, versatz, achse = resultat
+  kopieren_und_rotieren(anzahl, versatz, achse.to_sym)
 end
 
 
 unless file_loaded? File.basename(__FILE__) 
-  UI.add_context_menu_handler do |menu|
-    if model.selection.length > 0
-      menu.add_separator
-      menu.add_item("Rotationskopie") { copy_and_rotate_with_dialog }
+  UI.add_context_menu_handler do |menue|
+    if modell.selection.length > 0
+      menue.add_separator
+      menue.add_item("Kopieren und Rotieren") { kopieren_und_rotieren_mit_dialog }
     end
   end
 end
 
-file_loaded File.basename(__FILE__) 
+file_loaded File.basename(__FILE__)

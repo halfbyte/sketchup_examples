@@ -1,45 +1,48 @@
 require 'sketchup'
 require 'common_tools'
 
-def copy(num, distance, axis, direction = 1)
-  if group = group_from_selection
-    model.start_operation "Kopieren und Verschieben"
-    num.times do |i|
-      copy = group.copy
-      trans = case(axis)
+include CommonTools
+
+def kopieren_und_verschieben(anzahl, abstand, achse, richtung = 1)
+  if gruppe = gruppe_aus_auswahl
+    modell.start_operation "Kopieren und Verschieben"
+    anzahl.times do |i|
+      kopie = gruppe.copy
+      translation = case(achse)
       when :x
-        [distance * i * direction, 0, 0]
+        [abstand * i * richtung, 0, 0]
       when :y
-        [0, distance * i * direction, 0]
+        [0, abstand * i * richtung, 0]
       when :z
-        [0, 0, distance * i * direction]
+        [0, 0, abstand * i * richtung]
       end
-      transformation = Geom::Transformation.translation(trans)
-      copy.transform!(transformation)
+      puts translation.inspect
+      transformation = Geom::Transformation.translation(translation)
+      kopie.transform!(transformation)
     end
-    model.commit_operation
+    modell.commit_operation
   else
-    UI.messagebox "Sie haben nichts gutes selektiert, was kopiert werden könnte", MB_OK
+    UI.messagebox "Sie haben nichts gutes selektiert, was kopiert werden koennte", MB_OK
   end
 end
 
 
-def copy_with_dialog
-  prompts = ['Anzahl', 'Abstand', 'Achse', 'Richtung']
-  values = [10, 10,'x', 'forward']
-  options = [nil, nil, 'x|y|z', 'forward|backwards']
-  result = UI.inputbox prompts, values, options, "Kopieren und Verschieben"
-  num, distance, axis, direction = result
-  direction = direction == 'forward' ? 1 : -1
-  copy(num, distance, axis.to_sym, direction)
+def kopieren_und_verschieben_mit_dialog
+  namen = ['Anzahl', 'Abstand', 'Achse', 'Richtung']
+  vorgabewerte = [10, 10,'x', 'forward']
+  optionen = [nil, nil, 'x|y|z', 'vorwaerts|rueckwaerts']
+  resultat = UI.inputbox namen, vorgabewerte, optionen, "Kopieren und Verschieben"
+  anzahl, abstand, achse, richtung = resultat
+  richtung = richtung == 'vorwaerts' ? 1 : -1
+  kopieren_und_verschieben(anzahl, abstand, achse.to_sym, richtung)
 end
 
 
 unless file_loaded? File.basename(__FILE__) 
-  UI.add_context_menu_handler do |menu|
-    if model.selection.length > 0
-      menu.add_separator
-      menu.add_item("Kopieren und Verschieben") { copy_with_dialog }
+  UI.add_context_menu_handler do |menue|
+    if modell.selection.length > 0
+      menue.add_separator
+      menue.add_item("Kopieren und Verschieben") { kopieren_und_verschieben_mit_dialog }
     end
   end
 end

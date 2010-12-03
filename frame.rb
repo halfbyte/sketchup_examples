@@ -1,35 +1,36 @@
 require 'sketchup'
-def frame(width, height, thickness, depth)
-  model = Sketchup.active_model
-  group = model.entities.add_group
-  outer_face = group.entities.add_face(
+
+def rahmen(breite, hoehe, tiefe, dicke)
+  modell = Sketchup.active_model
+  gruppe = modell.entities.add_group
+  aussenflaeche = gruppe.entities.add_face(
     [0,0,0],
-    [width, 0,0],
-    [width, height, 0],
-    [0, height, 0]
+    [breite, 0,0],
+    [breite, hoehe, 0],
+    [0, hoehe, 0]
   )
-  face = group.entities.add_face(
-    [thickness, thickness, 0],
-    [width - thickness, thickness, 0],
-    [width - thickness, height - thickness, 0],
-    [thickness, height - thickness, 0]
+  innenflaeche = gruppe.entities.add_face(
+    [dicke, dicke, 0],
+    [breite - dicke, dicke, 0],
+    [breite - dicke, hoehe - dicke, 0],
+    [dicke, hoehe - dicke, 0]
   )
-  face.erase!
-  outer_face.reverse!
-  outer_face.pushpull(depth)  
+  innenflaeche.erase!
+  aussenflaeche.reverse!
+  aussenflaeche.pushpull(tiefe)  
 end
 
 
-def frame_with_inputbox
-  prompts = ['Breite', 'Höhe', 'Dicke', 'Tiefe']
-  values = [20, 20, 5, 5]
-  result = UI.inputbox prompts, values, "Create Frame"
-  frame(*result)
+def rahmen_mit_dialog
+  namen = ['Breite', 'Hoehe', 'Tiefe', 'Dicke']
+  werte = [20, 20, 5, 5]
+  resultat = UI.inputbox namen, werte, "Rahmen erstellen"
+  rahmen(*resultat)
 end
 
 unless file_loaded? File.basename(__FILE__) 
-  UI.menu("Plug-Ins").add_item("Draw Frame") do 
-    frame_with_inputbox
+  UI.menu("Plug-Ins").add_item("Rahmen erstellen") do 
+    rahmen_mit_dialog
   end
 end
 
