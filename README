@@ -13,11 +13,11 @@ Haben Sie kein Ruby installiert (das ist zum ausprobieren unserer Beispiele auch
 
 ---------------8<-------------------
 # basisverzeichnis und lib zum load_path hinzufuegen
-this_path = 'C:\Dokumente und Einstellungen\jan\Eigene Dateien\Sketchup-Beispiele\'
+this_path = 'C:/Dokumente und Einstellungen/jan/Eigene Dateien/Sketchup-Beispiele'
 $LOAD_PATH.unshift(this_path)
-$LOAD_PATH.unshift('#{File.join(this_path, 'lib')}')
+$LOAD_PATH.unshift(File.join(this_path, 'lib'))
 # alle beispiele laden
-require_all('#{this_path}')
+require_all(this_path)
 ---------------8<-------------------
 
 Diese Datei muss dann, wie im Artikel beschrieben, in den jeweils passenden Plugins-Ordner von Sketchup eingefügt werden.
