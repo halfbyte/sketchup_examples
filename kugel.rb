@@ -1,8 +1,9 @@
 require 'sketchup'
+require 'werkzeuge'
 module JK
   class Kugel
     attr_reader :gruppe
-    include CommonTools
+    include JK::Werkzeuge
     
     def self.dialog
       namen = ['Radius', 'Anzahl Segmente']

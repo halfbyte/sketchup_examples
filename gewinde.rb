@@ -1,5 +1,8 @@
+require 'sketchup'
+require 'werkzeuge'
 module JK
   class ScrewThread
+    include JK::Werkzeuge
     def initialize(inner_radius, outer_radius, length, lead, angle)
       @inner_radius = inner_radius.to_f
       @outer_radius = outer_radius.to_f
@@ -7,7 +10,7 @@ module JK
       @lead = lead.to_f
       @angle = angle.to_f
       
-      @definition = Sketchup.active_model.definitions.add "Screw Thread"
+      @definition = modell.definitions.add "Screw Thread"
   		@definition.insertion_point = Geom::Point3d.new(0, 0, 0)
   		
       create_cylinder
@@ -16,10 +19,10 @@ module JK
     def self.dialog
       dialog = UI::WebDialog.new("Schraubgewinde", false, 'screw-thread-dialog', 600, 600)
       dialog.set_file(File.join(File.dirname(__FILE__), 'html', 'screw_thread_form.html'))
-      dialog.show_modal
+      dialog.show
       dialog.add_action_callback("screw_thread_fill_defaults") do |dialog, params|
         puts "fill_defaults"
-        dialog.execute_script("screw_thread_fill_defaults(#{20},#{22},#{20},#{10},#{60})")
+        dialog.execute_script("screw_thread_fill_defaults(#{10},#{13},#{20},#{4},#{60})")
       end
       
       dialog.add_action_callback("screw_thread_cancel") do |dialog, params|
@@ -53,35 +56,51 @@ module JK
       
       mesh = Geom::PolygonMesh.new 
       
-      i = 0
+      i = -1
       inner_points = []
       top_points = []
       bottom_points = []
-      z = - (2 * @lead)
+      z = - (@lead * 2)
       
       
       
       
-      while z < (@length + 2 * @lead)
+      while z < (@length + (@lead * 2))
+        
+        i += 1
+        z += z_step 
+        
         alpha = step * i
         top_radius = @inner_radius + thickness
         bottom_radius = @inner_radius + thickness
         inner_radius = @inner_radius
-
+        
+        tangens = Math::tan(@angle / 180 * Math::PI)
+        #puts tangens
         z_bottom = z - z_diff
+        z_top = z + z_diff        
+
+        if z < 0 && z_top < 0 && z_bottom < 0 && z_bottom + (z_diff * 24) < 0
+          puts "alles < null"
+          next
+        end
+
+
+
         if z_bottom < 0
           z_bottom = 0
-          bottom_radius = @inner_radius + ((z - z_bottom) * Math::tan(@angle / 180 * Math::PI))
+          bottom_radius = @inner_radius + ((z - z_bottom) * tangens)
         end
         if z_bottom > @length
           z_bottom = @length
         end
 
-        z_top = z + z_diff        
         if z_top > @length
           z_top = @length
-          top_radius = @inner_radius + ((z_top - z) * Math::tan(@angle / 180 * Math::PI))
+          top_radius = @inner_radius + ((z_top - z) * tangens)
         end
+
+
         
         if z_top < 0
           z_top = 0
@@ -91,25 +110,30 @@ module JK
         z_middle = z
         if z_middle > @length
           z_middle = @length
-          inner_radius = @inner_radius + (z_middle - z_bottom) * Math::tan(@angle / 180 * Math::PI)
+          inner_radius = @inner_radius + ((z_diff - (z_middle - z_bottom)) * tangens)
+          puts(z_diff - (z_middle - z_bottom))
         end
+        
+        
+        
         if z_middle < 0
           z_middle = 0
-          inner_radius = @inner_radius + (z_top - z_middle) * Math::tan(@angle / 180 * Math::PI)
+          inner_radius = @inner_radius + ((z_diff - z_top) * tangens)
+        
         end
         # adding points
-        if z_bottom <= z_middle && z_top >= z_middle
-          inner_points << mesh.add_point([Math.sin(alpha) * inner_radius, Math.cos(alpha) * @inner_radius, z_middle ])
+        if z_bottom <= z_middle && z_top >= z_middle && z_bottom < @length && z_top > 0
+          inner_points << mesh.add_point([Math.cos(alpha) * inner_radius, Math.sin(alpha) * inner_radius, z_middle ])
         else
           inner_points << nil
         end
-        if z_middle < @length
-          top_points << mesh.add_point([Math.sin(alpha) * top_radius, Math.cos(alpha) * top_radius, z_top ])
+        if z_middle <= @length && z_top != z_bottom
+          top_points << mesh.add_point([Math.cos(alpha) * top_radius, Math.sin(alpha) * top_radius, z_top ])
         else
           top_points << nil
         end
-        if z_middle > 0 
-          bottom_points << mesh.add_point([Math.sin(alpha) * bottom_radius, Math.cos(alpha) * bottom_radius, z_bottom ])
+        if z_middle >= 0 && (z + z_diff - (z_step * 25)) <= @length 
+          bottom_points << mesh.add_point([Math.cos(alpha) * bottom_radius, Math.sin(alpha) * bottom_radius, z_bottom ])
         else
           bottom_points << nil
         end
@@ -118,8 +142,7 @@ module JK
         # inner_points_top << mesh.add_point([Math.sin(alpha) * @inner_radius, Math.cos(alpha) * @inner_radius, z_top])
         # inner_points_bottom << mesh.add_point([Math.sin(alpha) * @inner_radius, Math.cos(alpha) * @inner_radius, z_bottom])
         
-        i += 1
-        z += z_step
+       
       end
       (inner_points.length - 1).times do |i|
         if (inner_points[i] && top_points[i] && inner_points[i + 1] && top_points[i + 1])
@@ -162,44 +185,7 @@ module JK
         end
       end
       
-      # adding some meshes for the start and end of the thread
-      # 24.downto(1) do |i|
-      #   if (mesh.point_at(bottom_points[i]).z - @lead + (2 * z_diff)) < 0
-      #     if mesh.point_at(bottom_points[i]).z == 0
-      #       if (i < 2)
-      #         bottom_point_one = mesh.add_point [mesh.point_at(inner_points[i]).x, mesh.point_at(inner_points[i]).y, 0]
-      #         mesh.add_polygon(bottom_point_one, bottom_points[i], bottom_points[i - 1])
-      #       else
-      #         bottom_point_one = mesh.add_point [mesh.point_at(inner_points[i]).x, mesh.point_at(inner_points[i]).y, 0]
-      #         bottom_point_two = mesh.add_point [mesh.point_at(inner_points[i - 1]).x, mesh.point_at(inner_points[i - 1]).y, 0]
-      #         mesh.add_polygon(bottom_points[i], bottom_point_one, bottom_point_two)
-      #         mesh.add_polygon(bottom_points[i - 1], bottom_points[i], bottom_point_two)
-      #       end
-      #     else
-      #       bottom_inner_point_one = mesh.add_point [mesh.point_at(inner_points[i]).x, mesh.point_at(inner_points[i]).y, 0]
-      #       bottom_inner_point_two = mesh.add_point [mesh.point_at(inner_points[i - 1]).x, mesh.point_at(inner_points[i - 1]).y, 0]
-      #       bottom_outer_point_one = mesh.add_point [mesh.point_at(bottom_points[i]).x, mesh.point_at(bottom_points[i]).y, 0]
-      #       bottom_outer_point_two = mesh.add_point [mesh.point_at(bottom_points[i - 1]).x, mesh.point_at(bottom_points[i - 1]).y, 0]
-      #       mesh.add_polygon(bottom_points[i], bottom_outer_point_one, bottom_outer_point_two)
-      #       mesh.add_polygon(bottom_points[i - 1], bottom_points[i], bottom_outer_point_two)
-      #       mesh.add_polygon(bottom_inner_point_one, bottom_outer_point_two, bottom_outer_point_one)
-      #       mesh.add_polygon(bottom_inner_point_one, bottom_inner_point_two, bottom_outer_point_two)
-      #     end
-      #   else
-      #     
-      #     bottom_inner_point_one = mesh.add_point [mesh.point_at(inner_points[i]).x, mesh.point_at(inner_points[i]).y, 0]
-      #     bottom_inner_point_two = mesh.add_point [mesh.point_at(inner_points[i - 1]).x, mesh.point_at(inner_points[i - 1]).y, 0]
-      #     bottom_outer_point_one = mesh.add_point [mesh.point_at(bottom_points[i]).x, mesh.point_at(bottom_points[i]).y, mesh.point_at(bottom_points[i]).z - @lead + (2 * z_diff)]
-      #     bottom_outer_point_two = mesh.add_point [mesh.point_at(bottom_points[i - 1]).x, mesh.point_at(bottom_points[i - 1]).y, mesh.point_at(bottom_points[i - 1]).z - @lead + (2 * z_diff)]
-      # 
-      # 
-      #     mesh.add_polygon(bottom_points[i], bottom_outer_point_one, bottom_outer_point_two)
-      #     mesh.add_polygon(bottom_points[i - 1], bottom_points[i], bottom_outer_point_two)
-      #     # mesh.add_polygon(bottom_inner_point_one, bottom_outer_point_two, bottom_outer_point_one)
-      #     # mesh.add_polygon(bottom_inner_point_one, bottom_inner_point_two, bottom_outer_point_two)
-      #               
-      #   end
-      # end
+     
       
       
       
@@ -209,7 +195,7 @@ module JK
     end
     
     def place_component
-      model.place_component @definition
+      modell.place_component @definition
     end
     
    

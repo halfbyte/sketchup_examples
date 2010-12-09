@@ -1,7 +1,7 @@
 require 'sketchup'
-require 'common_tools'
+require 'werkzeuge'
 
-include CommonTools
+include JK::Werkzeuge
 
 def kopieren_und_verschieben(anzahl, abstand, achse, richtung = 1)
   if gruppe = gruppe_aus_auswahl

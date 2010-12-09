@@ -1,6 +1,6 @@
 require 'sketchup'
 module JK
-  module BeispielHelper
+  module BeispielHelfer
     include Sketchup
     def self.neu_laden!
       Dir[File.expand_path(File.dirname(__FILE__)) + "/*.rb"].map do |datei|
@@ -10,11 +10,11 @@ module JK
     end
   end
 end
+
 unless file_loaded? File.basename(__FILE__)
   UI.menu("Plug-Ins").add_separator
   UI.menu("Plug-Ins").add_item("Beispiele Neuladen") do
-    JK::BeispielHelper::neu_laden!
+    JK::BeispielHelfer::neu_laden!
   end
 end
-
 file_loaded File.basename(__FILE__)
