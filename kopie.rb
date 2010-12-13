@@ -5,7 +5,7 @@ include JK::Werkzeuge
 
 def kopieren_und_verschieben(anzahl, abstand, achse, richtung = 1)
   if gruppe = gruppe_aus_auswahl
-    modell.start_operation "Kopieren und Verschieben"
+    modell.start_operation "Kopieren und verschieben"
     anzahl.times do |i|
       kopie = gruppe.copy
       translation = case(achse)
@@ -31,7 +31,7 @@ def kopieren_und_verschieben_mit_dialog
   namen = ['Anzahl', 'Abstand', 'Achse', 'Richtung']
   vorgabewerte = [10, 10,'x', 'forward']
   optionen = [nil, nil, 'x|y|z', 'vorwaerts|rueckwaerts']
-  resultat = UI.inputbox namen, vorgabewerte, optionen, "Kopieren und Verschieben"
+  resultat = UI.inputbox namen, vorgabewerte, optionen, "Kopieren und verschieben"
   anzahl, abstand, achse, richtung = resultat
   richtung = richtung == 'vorwaerts' ? 1 : -1
   kopieren_und_verschieben(anzahl, abstand, achse.to_sym, richtung)
@@ -42,7 +42,7 @@ unless file_loaded? File.basename(__FILE__)
   UI.add_context_menu_handler do |menue|
     if modell.selection.length > 0
       menue.add_separator
-      menue.add_item("Kopieren und Verschieben") { kopieren_und_verschieben_mit_dialog }
+      menue.add_item("Kopieren und verschieben") { kopieren_und_verschieben_mit_dialog }
     end
   end
 end
